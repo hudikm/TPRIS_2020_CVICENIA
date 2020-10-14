@@ -50,15 +50,15 @@
  */
 volatile bool pitIsrFlag = false;
 
-//void delay(uint32_t t) {
+//void delay_pit(uint32_t t) {
 //	volatile uint32_t i = 0;
 //	for (i = 0; i < 150000 * t; ++i) { //200000 -> 200ms // 20Mhz clozk
 //		__asm("NOP");
 //		/* delay */
 //	}
 //}
-#define delay(x) delay_pit(x)
-char *MORSE_TABLE[] = { "._", //A
+
+const char *const MORSE_TABLE[] = { "._", //A
 		"_...", //B
 		"_._.", //C
 		"_..", //D
@@ -84,6 +84,7 @@ char *MORSE_TABLE[] = { "._", //A
 		"_.._", //X
 		"_.__", //Y
 		"__..", //Z
+		"___...___", // [ (V MORZEVEJ ABECEDE tzv. BREAK)
 		};
 
 #define LED_OFF() GPIO_SetPinsOutput(BOARD_INITPINS_LED_BLUE_GPIO, BOARD_INITPINS_LED_BLUE_GPIO_PIN_MASK)
@@ -139,39 +140,36 @@ int main(void) {
 	PIT_StartTimer(PIT, kPIT_Chnl_0);
 
 	PRINTF("Hello World\n");
-	char *sos = "SKUSKA MORZEOVEJ ABECEDY";
+	const char *const sos = "SKUSKA MORZEOVEJ ABECEDY[";
 
-	/* Force the counter to be placed into memory. */
-	volatile static int i = 0;
 	/* Enter an infinite loop, just incrementing a counter. */
 	LED_OFF();
 	while (1) {
-		i++;
-		char *pt = sos;
+		const char *pt = sos;
 
 		while (*pt != 0) {
 			if (*pt != ' ') {
-				char *c = MORSE_TABLE[*pt - 'A']; //Zakodovaný znak
+				const char *c = MORSE_TABLE[*pt - 'A']; //Zakodovaný znak
 
 				while (*c != 0) {
 					LED_ON();
 					if (*c == '.') {
-						delay(1);
+						delay_pit(1);
 					} else {
-						delay(3);
+						delay_pit(3);
 					}
 					LED_OFF();
-					delay(1); //1. pauza medzi . a -
+					delay_pit(1); //1. pauza medzi . a -
 					c++;
 				}
-				delay(2); //1 + 2 = 3. medzery medzi pismenami
+				delay_pit(2); //1 + 2 = 3 medzery medzi pismenami
 			} else {
 				//Medzera medzi slovami vo vete
-				delay(7);
+				delay_pit(7);
 			}
 			pt++;
 		}
-		delay(4); //3 + 4 =7. medzier medzi pismenami
+		delay_pit(4); //3 + 4 =7 medzier medzi slovami
 	}
 	return 0;
 }
