@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <launchConfiguration type="com.nxp.mcuxpresso.core.debug.support.segger.launchConfigurationType">
-<stringAttribute key="InstructionTraceInfo" value="eJydVNmO2jAUfe9XWH6nxCEb0qQjCKAikYESd3hEnmAgJQty7M7y9bXJMmRwq1Hz5Nx7zrmrfXf/kqXgN2VlUuQ+RF8NCGgeF7skP/jwJ571PHj/7csd5RnlTxPKSZKW8h8TdqB8RgkXjJYgJL8K9tioSI0wyTsGSZnicExKCka7naSUPuwhCFbySHPuwz1JSwr7EjfZ4A84e+B4juMhR4uff1J3ise3uo5h2K5eN7zBm45nDWzLvsZzJmq4bM8z1zHQwDF0DMxITGciz2naTcoeOpanpcggQcFolByOPCiyc5FLPxht5hP8XU7PgmAUc0HSaE2y8SunUhA5A0/ZBS/WtBQZbWoEKldtccFR5KcoeZNQZJiSHJSLIj758EGkaXWG4IcgjFMWnWURPrSMoQOrpm3Ho2gKHkkqpP19dHVLt6tlNMfz5UODQKbpea03HEV4um58PRNZruUNbOS2iNliuXnnWkbF7Ws7045F0zRN9dWgdMVKiTU9RFzKyG3+7w9W671vro3KoRO88scyScKIjFaCB5E9UeZD81JmJM7nQrZ9B4LsHBIeH9tpBq9xSoNC5FzBK6NkqILrawsmhBP1Xy8UWCT5CbUCIXkJSSkLVxNvwhqXsHqRmvcJFVTNqM1elfnMV6zYJ6l8aOqsy6r6bYDXi3bCjuu6Zr0+/b+Q+lc9rbZEyeDxtZBaRNcYIrNdF+1adK/ljZ9+3Jur26rZG9W6CM+aHKpm9v8d4ILovK7K0n1//wAMsMSrAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"/>
 <stringAttribute key="com.crt.ctrlcenter.OFSemuDetails" value="JLink123456"/>
 <booleanAttribute key="com.crt.ctrlcenter.mainBreakIsHardware" value="true"/>
 <stringAttribute key="com.crt.ctrlcenter.serialNumber" value="USB 123456"/>
@@ -23,7 +22,7 @@
 <stringAttribute key="com.nxp.mcuxpresso.segger.init.register" value="-noir"/>
 <stringAttribute key="com.nxp.mcuxpresso.segger.jlinkscriptfile" value=""/>
 <stringAttribute key="com.nxp.mcuxpresso.segger.options" value=""/>
-<intAttribute key="com.nxp.mcuxpresso.segger.port" value="2336"/>
+<intAttribute key="com.nxp.mcuxpresso.segger.port" value="2331"/>
 <booleanAttribute key="com.nxp.mcuxpresso.segger.powertarget 50" value="false"/>
 <stringAttribute key="com.nxp.mcuxpresso.segger.reset" value="true;"/>
 <stringAttribute key="com.nxp.mcuxpresso.segger.rtos" value="false;GDBServer/RTOSPlugin_FreeRTOS"/>
@@ -31,8 +30,8 @@
 <stringAttribute key="com.nxp.mcuxpresso.segger.silent" value="-nosilent"/>
 <stringAttribute key="com.nxp.mcuxpresso.segger.singlerun" value="-singlerun"/>
 <stringAttribute key="com.nxp.mcuxpresso.segger.speed" value="auto"/>
-<intAttribute key="com.nxp.mcuxpresso.segger.swoport" value="2334"/>
-<intAttribute key="com.nxp.mcuxpresso.segger.telnetport" value="2335"/>
+<intAttribute key="com.nxp.mcuxpresso.segger.swoport" value="2332"/>
+<intAttribute key="com.nxp.mcuxpresso.segger.telnetport" value="2333"/>
 <stringAttribute key="com.nxp.mcuxpresso.segger.verify" value="-vd"/>
 <stringAttribute key="disconnect" value="Run"/>
 <stringAttribute key="launch.config.handler" value="com.nxp.mcuxpresso.core.debug.support.segger.launches.JLinkLaunchConfigHandler"/>
@@ -47,7 +46,7 @@
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.loadImage" value="true"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.loadSymbols" value="true"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.pcRegister" value=""/>
-<intAttribute key="org.eclipse.cdt.debug.gdbjtag.core.portNumber" value="2336"/>
+<intAttribute key="org.eclipse.cdt.debug.gdbjtag.core.portNumber" value="2331"/>
 <stringAttribute key="org.eclipse.cdt.debug.gdbjtag.core.runCommands" value=""/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setPcRegister" value="false"/>
 <booleanAttribute key="org.eclipse.cdt.debug.gdbjtag.core.setResume" value="false"/>
@@ -71,12 +70,12 @@
 <booleanAttribute key="org.eclipse.cdt.dsf.gdb.UPDATE_THREADLIST_ON_SUSPEND" value="false"/>
 <intAttribute key="org.eclipse.cdt.launch.ATTR_BUILD_BEFORE_LAUNCH_ATTR" value="2"/>
 <stringAttribute key="org.eclipse.cdt.launch.DEBUGGER_START_MODE" value="remote"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug/MKL25Z128xxx4_LEDMORSE.axf"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="MKL25Z128xxx4_LEDMORSE"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROGRAM_NAME" value="Debug/MKL25Z128xxx4_Manchester.axf"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_ATTR" value="MKL25Z128xxx4_Manchester"/>
 <booleanAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_AUTO_ATTR" value="false"/>
-<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="com.crt.advproject.config.exe.debug.1904847607"/>
+<stringAttribute key="org.eclipse.cdt.launch.PROJECT_BUILD_CONFIG_ID_ATTR" value="com.crt.advproject.config.exe.debug.793365946"/>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_PATHS">
-<listEntry value="/MKL25Z128xxx4_LEDMORSE"/>
+<listEntry value="/MKL25Z128xxx4_Manchester"/>
 </listAttribute>
 <listAttribute key="org.eclipse.debug.core.MAPPED_RESOURCE_TYPES">
 <listEntry value="4"/>
