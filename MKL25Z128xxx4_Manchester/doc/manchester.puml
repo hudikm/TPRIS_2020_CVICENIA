@@ -1,0 +1,32 @@
+@startuml
+
+hide empty description
+[*] -right-> START_BIT_A :InterruptFallingEdge
+START_BIT_A : Inicializácia/Vynulovanie pomocných premenných \n\tbit_index = 0
+START_BIT_A : <b>Spusti PIT timer 3/4 periody </b>
+
+START_BIT_A --> TIMER_INT: <b>Prerušenie od časovača</b>
+TIMER_INT: Stop timer
+TIMER_INT: <b>Načítaj bit z RX pinu; bit_index++</b>
+TIMER_INT: Enable InterruptEitherEdge
+
+state START_BIT_B
+START_BIT_B : 
+START_BIT_B : <b>Spusti PIT timer 3/4 periody</b>
+START_BIT_B --> TIMER_INT: <b>Prerušenie od časovača</b>
+
+
+state RX_INT{
+    state c <<choice>>
+    state "Prvé 4bity načítané(LSb)\n<b>Enable InterruptFallingEdge</b>" as LSB <<sdlreceive>>
+    state "Druhé 4bity načítané(MSb)\n<b>Enable InterruptFallingEdge</b>" as MSB <<sdlreceive>>
+    state "Disable INT: <b>InterruptOrDMADisabled</b> \n<b>Spusti PIT timer 3/4 periody </b>" as BIT <<sdlreceive>>
+    c--> LSB:[bit_index==4]
+    c--> MSB:[bit_index==8]
+    c--> BIT:[bit_index !=4 && bit_index!=8]
+    LSB-->START_BIT_B:<b>InterruptFallingEdge</b>
+    MSB-->START_BIT_A:<b>InterruptFallingEdge</b>
+    BIT-->TIMER_INT:<b>Prerušenie od časovača</b>
+}
+TIMER_INT --> RX_INT: <b>InterruptEitherEdge</b>
+@enduml

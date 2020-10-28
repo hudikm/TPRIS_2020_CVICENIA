@@ -1,0 +1,38 @@
+@startuml
+clock clk with period 1
+
+binary "ZNAK 'A' 0x41 \n01000001b" as RX
+binary "MANCHESTER" as MA
+@RX
+0 is 1
++1 is 0
++1 is 0
++1 is 0
++1 is 0
++1 is 0
++1 is 1
++1 is 0
+
+
+RX@0<->@4 : LSb
+RX@4<->@8 : MSb
+
+@MA
+0 is 1
++0.5 is 0
++0.5 is 0
++0.5 is 1
++0.5 is 0
++0.5 is 1
++0.5 is 0
++0.5 is 1
++0.5 is 0
++0.5 is 1
++0.5 is 0
++0.5 is 1
++0.5 is 1
++0.5 is 0
++0.5 is 0
++0.5 is 1
+
+@enduml
