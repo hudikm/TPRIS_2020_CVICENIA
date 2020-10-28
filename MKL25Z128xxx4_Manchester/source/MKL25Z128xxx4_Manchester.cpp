@@ -46,16 +46,18 @@
 #include "fsl_gpio.h"
 
 enum class STATE {
-	WAIT_FOR_START_A, WAIT_FOR_START_B, START_TIMER, WAIT_FOR_TIMERINT
+	START_BIT_A, START_BIT_B, RX_INT, TIMER_INT
 
 };
+#define LOGIC_ANALYZER_DEBUG 0
 
-#define _3_4OFBIT  72U //19200 //104 * 0.75 //22U 57600
+#define _3_4OFBIT  68U //19200 //104 * 0.75 //22U 57600
 
-volatile STATE cur_state = STATE::WAIT_FOR_START_A;
+volatile STATE next_state = STATE::START_BIT_A;
 volatile uint8_t bit_index = 0;
 volatile uint8_t inputByte = 0;
 volatile bool newByte = false;
+volatile bool newEvent = false;
 
 #pragma GCC push_options
 #pragma GCC optimize ("O3")
@@ -63,76 +65,32 @@ volatile bool newByte = false;
 extern "C" void PIT_IRQHandler() {
 	PIT_ClearStatusFlags(PIT, kPIT_Chnl_0, kPIT_TimerFlag);
 	PIT_StopTimer(PIT, kPIT_Chnl_0);
+	newEvent = true;
+#if LOGIC_ANALYZER_DEBUG
+	GPIO_SetPinsOutput(BOARD_INITPINS_OUT_PIN_GPIO,
+	BOARD_INITPINS_OUT_PIN_GPIO_PIN_MASK);
+	__asm volatile ("nop");
+	GPIO_ClearPinsOutput(BOARD_INITPINS_OUT_PIN_GPIO,
+	BOARD_INITPINS_OUT_PIN_GPIO_PIN_MASK);
+#endif
 
-	if (cur_state == STATE::WAIT_FOR_TIMERINT) {
-		GPIO_SetPinsOutput(BOARD_INITPINS_OUT_PIN_GPIO,
-		BOARD_INITPINS_OUT_PIN_GPIO_PIN_MASK);
-
-		auto bit = GPIO_ReadPinInput(BOARD_INITPINS_RX_PIN_GPIO,
-		BOARD_INITPINS_RX_PIN_PIN);
-		inputByte |= (bit << bit_index);
-		bit_index++;
-		cur_state = STATE::START_TIMER;
-
-		/* Interrupt configuration on PORTA1 (pin 27): Interrupt on either edge */
-		PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
-		BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptEitherEdge);
-
-		GPIO_ClearPinsOutput(BOARD_INITPINS_OUT_PIN_GPIO,
-		BOARD_INITPINS_OUT_PIN_GPIO_PIN_MASK);
-	} else {
-		cur_state = STATE::WAIT_FOR_START_A;
-	}
 }
-
 
 extern "C" void PORTA_IRQHandler() {
 	PORT_ClearPinsInterruptFlags(BOARD_INITPINS_RX_PIN_PORT,
 	BOARD_INITPINS_RX_PIN_PIN_MASK);
-
+	newEvent = true;
+#if LOGIC_ANALYZER_DEBUG
 	GPIO_SetPinsOutput(BOARD_INITPINS_OUT2_PIN_GPIO,
 	BOARD_INITPINS_OUT2_PIN_GPIO_PIN_MASK);
-
-	switch (cur_state) {
-	case STATE::WAIT_FOR_TIMERINT:
-		__asm volatile ("nop");
-		break;
-	case STATE::WAIT_FOR_START_A:
-		inputByte = 0;
-		bit_index = 0;
-	case STATE::WAIT_FOR_START_B:
-		cur_state = STATE::WAIT_FOR_TIMERINT;
-		PIT_StartTimer(PIT, kPIT_Chnl_0);
-		break;
-	case STATE::START_TIMER:
-		if (bit_index == 4) { // Nacital som prve 4 bity
-			cur_state = STATE::WAIT_FOR_START_B;
-			PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
-			BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptFallingEdge);
-		} else if (bit_index == 8) { // Nacital som vsetky bity
-			cur_state = STATE::WAIT_FOR_START_A;
-			newByte = true;
-			PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
-			BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptFallingEdge);
-
-		} else {
-			/* Interrupt configuration on PORTA1 (pin 27): Interrupt on either edge */
-			PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
-			BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptOrDMADisabled);
-			cur_state = STATE::WAIT_FOR_TIMERINT;
-			PIT_StartTimer(PIT, kPIT_Chnl_0);
-		}
-		break;
-
-	default:
-		cur_state = STATE::WAIT_FOR_START_A;
-		break;
-	}
-
+	__asm volatile ("nop");
 	GPIO_ClearPinsOutput(BOARD_INITPINS_OUT2_PIN_GPIO,
 	BOARD_INITPINS_OUT2_PIN_GPIO_PIN_MASK);
+#endif
+
 }
 #pragma GCC pop_options
+
 int main(void) {
 	/* Init board hardware. */
 	BOARD_InitBootPins();
@@ -151,8 +109,6 @@ int main(void) {
 	/* Init pit module */
 	PIT_Init(PIT, &pitConfig);
 
-	PRINTF("Count: %d\n\r", USEC_TO_COUNT(_3_4OFBIT, CLOCK_GetBusClkFreq()));
-
 	/* Set timer period for channel 0 */
 	PIT_SetTimerPeriod(PIT, kPIT_Chnl_0,
 			USEC_TO_COUNT(_3_4OFBIT, CLOCK_GetBusClkFreq()));
@@ -166,18 +122,70 @@ int main(void) {
 	EnableIRQ(PIT_IRQn);
 	EnableIRQ(PORTA_IRQn);
 
-	/* Force the counter to be placed into memory. */
-	volatile static int i = 0;
 	/* Enter an infinite loop, just incrementing a counter. */
 	while (1) {
-		i++;
 
-		while (!newByte) {
+		while (!newEvent) {
 			__asm volatile ("nop");
 		}
-		uint8_t tmpByte = inputByte;
-		newByte = false;
-		PRINTF("%c", tmpByte);
+
+		newEvent = false;
+
+		switch (next_state) {
+		case STATE::START_BIT_A:
+			inputByte = 0;
+			bit_index = 0;
+			next_state = STATE::TIMER_INT;
+			PIT_StartTimer(PIT, kPIT_Chnl_0);
+			break;
+		case STATE::START_BIT_B:
+			next_state = STATE::TIMER_INT;
+			PIT_StartTimer(PIT, kPIT_Chnl_0);
+			break;
+		case STATE::RX_INT:
+			if (bit_index == 4) {
+				next_state = STATE::START_BIT_B;
+				PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
+				BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptFallingEdge);
+			} else if (bit_index == 8) {
+				/*
+				 * inputByte obsahuje novy bajt
+				 * */
+				PRINTF("%c", inputByte);
+				next_state = STATE::START_BIT_A;
+				PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
+				BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptFallingEdge);
+
+			} else {
+				PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
+				BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptOrDMADisabled);
+				next_state = STATE::TIMER_INT;
+				PIT_StartTimer(PIT, kPIT_Chnl_0);
+			}
+
+			break;
+		case STATE::TIMER_INT:
+			/* Ulozenie noveho bitu */
+		{
+			auto bit = GPIO_ReadPinInput(BOARD_INITPINS_RX_PIN_GPIO,
+			BOARD_INITPINS_RX_PIN_PIN);
+			inputByte |= (bit << bit_index);
+			bit_index++;
+		}
+
+			next_state = STATE::RX_INT;
+			/* Interrupt configuration on PORTA1 (pin 27): Interrupt on either edge */
+			PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
+			BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptEitherEdge);
+			break;
+
+
+		default:
+			next_state = STATE::START_BIT_A;
+			break;
+		}
+
 	}
 	return 0;
 }
+
