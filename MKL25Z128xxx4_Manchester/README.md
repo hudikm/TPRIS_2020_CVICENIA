@@ -4,12 +4,14 @@ Dáná úloha sa zaoberá možnosťou ako spracovať a dekódovať  Manchester e
 
 
 
-Zapúzdrenie manchester zakódovaného bajtu do UART rámca:
+### Zapúzdrenie manchester zakódovaného bajtu do UART rámca:
 ![](doc/manchester_uart_frame.svg)
-Príklad kódovanie bajtu do Manchester kódu
+
+### Príklad kódovanie bajtu do Manchester kódu
 ![](doc/manchester_diagram.svg)
-Časový diagram dekódovania dát zakódovaných Manchester kódom zapuzdrených v UART rámcoch
+
+### Časový diagram dekódovania dát zakódovaných Manchester kódom zapuzdrených v UART rámcoch
 ![](doc/manchester_uart.svg)
 
-Stavový diagram 
+### Stavový diagram 
 ![](doc/manchester.svg)
