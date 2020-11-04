@@ -49,9 +49,9 @@ enum class STATE {
 	START_BIT_A, START_BIT_B, RX_INT, TIMER_INT
 
 };
-#define LOGIC_ANALYZER_DEBUG 0
+#define LOGIC_ANALYZER_DEBUG 1
 
-#define _3_4OFBIT  68U //19200 //104 * 0.75 //22U 57600
+#define _3_4OFBIT  75U //19200 //104 * 0.75 //22U 57600
 
 volatile STATE next_state = STATE::START_BIT_A;
 volatile uint8_t bit_index = 0;
@@ -119,6 +119,9 @@ int main(void) {
 	PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
 	BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptFallingEdge);
 
+	NVIC_SetPriority(PIT_IRQn, 3);
+	NVIC_SetPriority(PORTA_IRQn, 2);
+
 	EnableIRQ(PIT_IRQn);
 	EnableIRQ(PORTA_IRQn);
 
@@ -178,7 +181,6 @@ int main(void) {
 			PORT_SetPinInterruptConfig(BOARD_INITPINS_RX_PIN_PORT,
 			BOARD_INITPINS_RX_PIN_PIN, kPORT_InterruptEitherEdge);
 			break;
-
 
 		default:
 			next_state = STATE::START_BIT_A;
