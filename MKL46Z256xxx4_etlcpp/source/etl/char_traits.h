@@ -62,7 +62,7 @@ namespace etl
     typedef char      state_type;
   };
 
-  template<>b struct char_traits_types<wchar_t>
+  template<> struct char_traits_types<wchar_t>
   {
     typedef wchar_t   char_type;
     typedef wchar_t   int_type;
